@@ -1,23 +1,8 @@
 let token = ""
-function showLogin() {
-    let but = `<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" onclick="login()">Login</button>`
-    document.getElementById("register").innerHTML = ""
-    document.getElementById("but").innerHTML = but
-}
-
-function showRegister() {
-    let str =  `<label for="confirmPassword"> Confirm Password</label>
-                        <input type="password" class="form-control" id="confirmPassword">`
-    let but = `<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" onclick="register()">Register</button>`
-    document.getElementById("register").innerHTML = str
-    document.getElementById("but").innerHTML = but
-}
 
 function register() {
-    let username = document.getElementById("username").value
-    let password = document.getElementById("password").value
+    let username = document.getElementById("orangeForm-name").value
+    let password = document.getElementById("passwordRe").value
     let confirmPassword = document.getElementById("confirmPassword").value
     let user = {
         username : username,
@@ -48,12 +33,13 @@ function register() {
 }
 
 function login() {
-    let username = document.getElementById("username").value
-    let password = document.getElementById("password").value
+    let username = document.getElementById("defaultForm-email").value
+    let password = document.getElementById("defaultForm-pass").value
     let user = {
         username : username,
         password : password
     }
+    console.log(user)
     $.ajax({
         headers: {
             'Accept': 'application/json',
@@ -64,9 +50,10 @@ function login() {
         data: JSON.stringify(user),
         success: function (data) {
             token = data.accessToken
+            showPageUser()
             let notification = "Successful login."
             document.getElementById("notification").innerHTML = notification
-            $('#exampleModal').modal('hide');
+            $('#modalLoginForm').modal('hide');
             $("#myModal").modal('show');
             setTimeout(function () {
                 $("#myModal").modal('hide');
@@ -125,3 +112,29 @@ function display(data) {
 </table>`
     document.getElementById("display").innerHTML = str
 }
+
+
+
+const $body = $("body");
+const $header = $(".page-header");
+const $navCollapse = $(".navbar-collapse");
+const scrollClass = "scroll";
+
+$(window).on("scroll", () => {
+    if (this.matchMedia("(min-width: 992px)").matches) {
+        const scrollY = $(this).scrollTop();
+        scrollY > 0
+            ? $body.addClass(scrollClass)
+            : $body.removeClass(scrollClass);
+    } else {
+        $body.removeClass(scrollClass);
+    }
+});
+
+$(".page-header .nav-link, .navbar-brand").on("click", function(e) {
+    e.preventDefault();
+    const href = $(this).attr("href");
+    $("html, body").animate({
+        scrollTop: $(href).offset().top - 71
+    }, 600);
+});

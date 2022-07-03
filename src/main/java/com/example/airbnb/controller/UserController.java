@@ -19,7 +19,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
+import java.io.File;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -47,61 +50,48 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
-    @GetMapping("/users")
-    public ResponseEntity<Iterable<User>> showAllUser() {
-        Iterable<User> users = userService.findAll();
-        return new ResponseEntity<>(users, HttpStatus.OK);
-    }
-
-    @GetMapping("/admin/users")
-    public ResponseEntity<Iterable<User>> showAllUserByAdmin() {
-        Iterable<User> users = userService.findAll();
-        return new ResponseEntity<>(users, HttpStatus.OK);
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<User> createUser(@RequestBody User user, BindingResult bindingResult) {
-        if (bindingResult.hasFieldErrors()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        Iterable<User> users = userService.findAll();
-        for (User currentUser : users) {
-            if (currentUser.getUsername().equals(user.getUsername())) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-        }
-        if (!userService.isCorrectConfirmPassword(user)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if (user.getRoles() != null) {
-            Role role = roleService.findByName("ROLE_ADMIN");
-            Set<Role> roles = new HashSet<>();
-            roles.add(role);
-            user.setRoles(roles);
-        } else {
-            Role role1 = roleService.findByName("ROLE_USER");
-            Set<Role> roles1 = new HashSet<>();
-            roles1.add(role1);
-            user.setRoles(roles1);
-        }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setConfirmPassword(passwordEncoder.encode(user.getConfirmPassword()));
-        userService.save(user);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
-    }
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String jwt = jwtService.generateTokenLogin(authentication);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        User currentUser = userService.findByUsername(user.getUsername());
-        return ResponseEntity.ok(new JwtResponse(jwt, currentUser.getId(), userDetails.getUsername(), userDetails.getAuthorities()));
-    }
+//    @PostMapping("/register")
+//    public ResponseEntity<User> createUser(@RequestBody User user, BindingResult bindingResult) {
+//        if (bindingResult.hasFieldErrors()) {
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        Iterable<User> users = userService.findAll();
+//        for (User currentUser : users) {
+//            if (currentUser.getUsername().equals(user.getUsername())) {
+//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//            }
+//        }
+//        if (!userService.isCorrectConfirmPassword(user)) {
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if (user.getRoles() != null) {
+//            Role role = roleService.findByName("ROLE_ADMIN");
+//            Set<Role> roles = new HashSet<>();
+//            roles.add(role);
+//            user.setRoles(roles);
+//        } else {
+//            Role role1 = roleService.findByName("ROLE_USER");
+//            Set<Role> roles1 = new HashSet<>();
+//            roles1.add(role1);
+//            user.setRoles(roles1);
+//        }
+//        user.setPassword(passwordEncoder.encode(user.getPassword()));
+//        user.setConfirmPassword(passwordEncoder.encode(user.getConfirmPassword()));
+//        userService.save(user);
+//        return new ResponseEntity<>(user, HttpStatus.CREATED);
+//    }
+//    @PostMapping("/login")
+//    public ResponseEntity<?> login(@RequestBody User user) {
+//        Authentication authentication = authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+//
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//        String jwt = jwtService.generateTokenLogin(authentication);
+//        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+//        User currentUser = userService.findByUsername(user.getUsername());
+//        return ResponseEntity.ok(new JwtResponse(jwt, currentUser.getId(), userDetails.getUsername(), userDetails.getAuthorities()));
+//    }
 
     @GetMapping("/hello")
     public ResponseEntity<String> hello(){
@@ -131,4 +121,6 @@ public class UserController {
         userService.save(user);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
+
+
 }
