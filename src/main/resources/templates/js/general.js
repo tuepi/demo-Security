@@ -86,8 +86,9 @@ function showGeneral() {
 function findAllProduct() {
     $.ajax({
         type: "GET",
-        url: "http://localhost:8000/product",
+        url: "http://localhost:8000/products",
         success: function (data) {
+            console.log(data)
             display1(data)
         },
         error: function (error) {

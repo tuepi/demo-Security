@@ -51,7 +51,7 @@ public class GeneralController {
     @Autowired
     ProductServiceImpl productService;
 
-    @GetMapping("/product")
+    @GetMapping("/products")
     public ResponseEntity<Iterable<Product>> findAllProduct() {
         List<Product> products = (List<Product>) productService.findAll();
         if (products.isEmpty()) {
